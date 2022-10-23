@@ -1,0 +1,1 @@
+# lightnovel-crawler-manager
