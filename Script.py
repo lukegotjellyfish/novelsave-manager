@@ -56,6 +56,12 @@ def add_novel(database1):
     # ======================================
     while True:
         novel_url_check = input("Novel URL: ")
+
+        # TODO: Add following details into SQL insert command
+        # result contains:
+        #  the novel ID (for novelsave)
+        #  the novel Title
+        #  the number of chapters
         result = subprocess.Popen(f"novelsave process {novel_url_check}",
                                   stderr=subprocess.PIPE)
 
