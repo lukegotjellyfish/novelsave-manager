@@ -41,11 +41,6 @@ class Database:
         return self.db
 
 
-# def scan_novels(database):
-#     for folder in os.listdir(database.novel_library_path):
-#         for novel in os.listdir(f"{database.novel_library_path}/{folder}"):
-#             print(novel)
-
 def check_source(url):
     pass
 
@@ -62,7 +57,7 @@ def add_novel(database1):
         result = subprocess.Popen(f"novelsave process {novel_url_check}",
                                   stderr=subprocess.PIPE)
 
-        #.communicate() waits for end
+        # .communicate() waits for end
         if result.communicate() != (None, b''):
             break
     # =======================================
@@ -76,10 +71,6 @@ def add_novel(database1):
     else:
         print("Invalid URL")
     print()
-
-novel_url = "https://www.scribblehub.com/series/114946/a-clich-multiverse-story/"
-novel_add_db = f"novelsave process {novel_url}"
-novel_package = f"novelsave package {novel_url} --target epub"
 
 
 def main():
