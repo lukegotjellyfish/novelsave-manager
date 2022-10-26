@@ -30,7 +30,7 @@ class Database:
 
         create_table = """CREATE TABLE IF NOT EXISTS
         Novels(
-            novel_id INTEGER PRIMARY_KEY AUTOINCREMENT, 
+            novel_id INTEGER PRIMARY_KEY, 
             novel_title TEXT, 
             novel_chapters INTEGER, 
             novel_url TEXT, 
