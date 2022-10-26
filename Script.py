@@ -29,7 +29,12 @@ class Database:
         self.dbCursor = self.db.cursor()
 
         create_table = """CREATE TABLE IF NOT EXISTS
-        Novels(novel_id INTEGER PRIMARY_KEY AUTOINCREMENT, novel_title TEXT, novel_chapters INTEGER, novel_url TEXT, novel_tags TEXT, novel_path TEXT)
+        Novels(novel_id INTEGER PRIMARY_KEY AUTOINCREMENT, 
+        novel_title TEXT, 
+        novel_chapters INTEGER, 
+        novel_url TEXT, 
+        novel_tags TEXT,
+        novel_path TEXT)
         """
         self.dbCursor.execute(create_table)
 
