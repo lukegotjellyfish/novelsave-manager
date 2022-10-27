@@ -2,6 +2,7 @@ import sqlite3
 import subprocess
 import re
 
+
 # valid_urls = [
 #     "readnovelfull.com/",
 #     "readlightnovels.net",
@@ -72,7 +73,6 @@ def add_novel(database1):
         # Downloading 411 pending chapters with 16 threads…
         # Chapters download complete, 411 succeeded, with 0 errors.
         # Skipped assets download as none are pending.
-
 
         result = subprocess.Popen(f"novelsave process {novel_url_check}",
                                   stderr=subprocess.PIPE)
