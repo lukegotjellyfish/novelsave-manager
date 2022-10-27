@@ -107,9 +107,13 @@ def main():
         novelsave_config_show = str(subprocess.Popen(f"novelsave config show", stdout=subprocess.PIPE).communicate())
         novel_ex_path = re.search(r"value=('.*[^']')", novelsave_config_show).group(1)
         print(f"Current Novel Export Path: {novel_ex_path}")
-        print("[1] Add Novel\n" + "[2] Update Novels\n" + "[3] Set Novel Export Path\n")
-        result = int(input(f"Select Function: "))
 
+        print("[1] Add Novel\n" + "[2] Update Novels\n" + "[3] Set Novel Export Path\n")
+
+        try:
+            result = int(input(f"Select Function: "))
+        except ValueError:
+            continue
         if result == 1:
             add_novel(database)
         if result == 2:
