@@ -74,11 +74,12 @@ def add_novel(database1):
         # Chapters download complete, 411 succeeded, with 0 errors.
         # Skipped assets download as none are pending.
 
-        result = subprocess.Popen(f"novelsave process {novel_url_check}",
-                                  stderr=subprocess.PIPE)
+        process_stdout, process_stderr = subprocess.Popen(f"novelsave process {novel_url_check}",
+                                                          stdout=subprocess.PIPE,
+                                                          stderr=subprocess.PIPE)
 
         # .communicate() waits for end
-        if result.communicate() != (None, b''):
+        if process_stderr.communicate() != (None, b''):
             break
     # =======================================
 
@@ -89,9 +90,9 @@ def add_novel(database1):
     # Acquired 'A Chance To Become An Adonis' (5) from database.
     # Packaging to 'epub' succeeded and saved to '{novel.dir}/Scribble Hub\A Chance To Become An Adonis\A Chance To Become An Adonis.epub'.
 
-    out, err = subprocess.Popen(f"novelsave package {novel_url_check} --target epub",
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    if "ID_OR_URL" not in str(err):
+    package_stdout, package_stderr = subprocess.Popen(f"novelsave package {novel_url_check} --target epub",
+                                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    if "ID_OR_URL" not in str(package_stderr):
         print(f"Added {novel_url_check} to novel database")
     else:
         print("Invalid URL")
