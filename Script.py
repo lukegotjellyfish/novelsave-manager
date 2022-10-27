@@ -93,6 +93,7 @@ def add_novel(database1):
     package_stdout, package_stderr = subprocess.Popen(f"novelsave package {novel_url_check} --target epub",
                                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     if "ID_OR_URL" not in str(package_stderr):
+        # TODO: SQL Execute here
         print(f"Added {novel_url_check} to novel database")
     else:
         print("Invalid URL")
