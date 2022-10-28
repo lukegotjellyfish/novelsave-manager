@@ -1,11 +1,12 @@
+import os
 import re
+import sys
 import threading
+import time
+
+import clipboard
 from ahk import AHK
 from ahk.daemon import AHKDaemon
-import time
-import os
-import clipboard
-import sys
 
 
 class Capture_To_Text:
