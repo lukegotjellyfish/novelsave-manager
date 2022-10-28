@@ -58,13 +58,13 @@ class Database:
                                                           stdout=subprocess.PIPE,
                                                           stderr=subprocess.PIPE).communicate()
         # If error
-        if (update == False) and (process_stderr != (None, b'')):
+        if process_stderr != (None, b''):
             return False
         # =======================================
         print()
 
         result = self.add_novel_to_db(novel_url_check, update)
-        if result == True:
+        if result is True:
             return True
         else:
             return False
@@ -76,14 +76,15 @@ class Database:
             max_novelsave_id = subprocess.Popen(f"novelsave list",
                                                 stdout=subprocess.PIPE).communicate()
             max_novelsave_id = decode_novelsave_output(max_novelsave_id).split("\n")[:-1][-1]
-            max_novelsave_id = int(re.search("\\|.*[^0-9]([0-9][0-9][0-9]|[0-9][0-9]|[0-9]).*[^\\|]\\|.*[^a-z][a-z]", max_novelsave_id).group(1)) + 1
+            max_novelsave_id = int(re.search("\\|.*[^0-9]([0-9][0-9][0-9]|[0-9][0-9]|[0-9]).*[^\\|]\\|.*[^a-z][a-z]",
+                                             max_novelsave_id).group(1)) + 1
         except IndexError:
             max_novelsave_id = 99999999
 
         print("\nUpdating Novels")
         for x in range(1, max_novelsave_id):
             result = self.add_novel_to_db(x, update=True)
-            if result == False:
+            if result is False:
                 print()
                 break
         print()
@@ -122,7 +123,7 @@ class Database:
             # If Novel not found in novelsave database, try to add it
             if "Novel not found" in info_output:
                 result = self.add_new_novel_to_db(novel_url_or_id)
-                if result == False:
+                if result is False:
                     return False
                 else:
                     break
@@ -152,7 +153,7 @@ class Database:
                 else:
                     new_novel_chapters = str(novel_entry[0][3])
 
-                if update == False:
+                if update is False:
                     self.dbCursor.execute("INSERT INTO Novels VALUES (NULL,?,?,?,?,?,?,?,?)",
                                           (novel_title, novel_author, novel_chapters, novel_url,
                                            novel_biography, novel_path, novelsave_id, novel_modified_date))
@@ -161,7 +162,8 @@ class Database:
                                              SET novel_chapters = ?, novel_modified_date = ?
                                              WHERE novel_title = ? AND novel_chapters != ?""",
                                                    (novel_chapters, novel_modified_date, novel_title, novel_chapters))
-                    print(f'Updated "{novel_title}" (ID: {novelsave_id}), |{new_novel_chapters}| chapters to |{novel_chapters}| chapters')
+                    print(
+                        f'Updated "{novel_title}" (ID: {novelsave_id}), |{new_novel_chapters}| chapters to |{novel_chapters}| chapters')
                 else:
                     print(f'No Updates for "{novel_title}" (ID: {novelsave_id})')
                 # Can't account for chapter list actually updating unless I do a SELECT call
@@ -175,7 +177,7 @@ class Database:
                 time.sleep(1)
             # If the novel title already exists in the database...
             except sqlite3.IntegrityError as err:
-                if update == False:
+                if update is False:
                     print(f"Database Error Message: {err}")
                     # If input is novelsave id
                     if type(novel_url_or_id) is int:
