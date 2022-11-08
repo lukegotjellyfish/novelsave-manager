@@ -140,8 +140,15 @@ class Database:
         novel_author = info_output[3].replace("author = ", "").replace("'", "")
         novel_chapters = info_output[11].replace("downloaded = ", "")
         novel_url = literal_eval(info_output[7].replace("urls = ", ""))[0]
+        novel_source = ""
+        if "novelfull" in novel_url:
+            novel_source = "NovelFull"
+        if "novelpub" in novel_url:
+            novel_source = "NovelPub"
+        if "scribble" in novel_url:
+            novel_source = "Scribble Hub"
         novel_biography = '\n'.join(literal_eval(info_output[6].replace("synopsis = ", "")))
-        novel_path = f"{self.novel_library_path}/{novel_title}/{novel_title}.epub"
+        novel_path = f"{self.novel_library_path}/{novel_source}/{novel_title}/{novel_title}.epub"
         novel_modified_date = int(round(datetime.now(timezone.utc).timestamp(), 0))
 
         # Try to add the novel details to the database
