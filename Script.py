@@ -72,9 +72,7 @@ class Database:
         else:
             return False
 
-    def update_novels(self):
-        # Todo: Get range of IDs from `novelsave list`
-
+    def update_novels(self, package=False):
         try:
             max_novelsave_id = subprocess.Popen(f"novelsave list",
                                                 stdout=subprocess.PIPE).communicate()
@@ -82,14 +80,22 @@ class Database:
             max_novelsave_id = int(re.search("\\|.*[^0-9]([0-9][0-9][0-9]|[0-9][0-9]|[0-9]).*[^\\|]\\|.*[^a-z][a-z]",
                                              max_novelsave_id).group(1)) + 1
         except IndexError:
-            max_novelsave_id = 99999999
+            max_novelsave_id = 1000
 
-        print("\nUpdating Novels")
+        if package == False:
+            print("\nUpdating Novels")
+        else:
+            print("\nPackaging Novels")
         for x in range(1, max_novelsave_id):
-            result = self.add_novel_to_db(x, update=True)
-            if result is False:
-                print()
-                break
+            if package == False:
+                result = self.add_novel_to_db(x, update=True)
+                if result is False:
+                    print()
+                    break
+            else:
+                subprocess.Popen(f"novelsave package {x}",
+                                                stdout=subprocess.PIPE).communicate()
+                print(f"Packaged NovelSave ID {x}")
         print()
 
     def add_novel_to_db(self, novel_url_or_id, update=False):
@@ -260,7 +266,8 @@ def main():
               "[2] Update/Add novelsave Novels\n" +
               "[3] Set Novel Export Path\n" +
               "[4] List Novels\n" +
-              "[5] Update Novel Covers")
+              "[5] Update Novel Covers\n" +
+              "[6] Package Novels")
 
         try:
             result = int(input(f"Select Function: "))
@@ -282,6 +289,8 @@ def main():
             print()
         if result == 5:
             database.update_novel_covers()
+        if result == 6:
+            database.update_novels(package=True)
 
 if __name__ == '__main__':
     main()
