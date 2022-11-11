@@ -207,11 +207,7 @@ class Database:
         # Novel has been added to the database, return True
         return True
 
-    def update_novel_covers(self, path):
-        if not os.path.exists(path):
-            print("Folder does not exist")
-            return
-
+    def update_novel_covers(self):
         self.dbCursor.execute("SELECT novel_url, novelsave_id FROM Novels")
         novel_entry_list = list(self.dbCursor.fetchall())
 
@@ -220,6 +216,10 @@ class Database:
 
             my_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
             url = novel_entry[0]
+
+            if "novelpub" not in url:
+                continue
+
             r = requests.get(url, headers=my_headers)
             html = r.text
             soup = BeautifulSoup(html, 'html.parser')
@@ -230,12 +230,13 @@ class Database:
             # https://novelfull.com/uploads/thumbs/war-sovereign-soaring-the-heaven-e5fb421bc4-2239c49aee6b961904acf173b7e4602a.jpg
 
             novel_cover = soup.find_all('img')
-            if "scribblehub" in url:
-                novel_cover = str(novel_cover[0].get('src'))
-            elif "novelpub" in url:
-                novel_cover = str(novel_cover[1].get('src'))
-            elif "novelfull" in url:
-                novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
+            # if "scribblehub" in url:
+            #     novel_cover = str(novel_cover[0].get('src'))
+            # elif "novelpub" in url:
+            #  novel_cover = str(novel_cover[1].get('src'))
+            novel_cover = str(novel_cover[1].get('src'))
+            # elif "novelfull" in url:
+            #     novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
 
             novel_cover_data = requests.get(novel_cover, headers=my_headers).content
 
@@ -244,6 +245,7 @@ class Database:
             with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
                 print(f"Downloading Novel Cover (ID: {novelsave_id}) : {novel_cover}")
                 nc.write(novel_cover_data)
+
 
 def main():
     database = Database("Novel_Database.db")
