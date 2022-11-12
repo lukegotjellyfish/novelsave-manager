@@ -214,6 +214,8 @@ class Database:
         return True
 
     def update_novel_covers(self):
+        # TODO Add novel cover ids to novelsave's database so when they are packed they are added
+
         self.dbCursor.execute("SELECT novel_url, novelsave_id FROM Novels")
         novel_entry_list = list(self.dbCursor.fetchall())
 
