@@ -94,7 +94,7 @@ class Database:
                     break
             else:
                 subprocess.Popen(f"novelsave package {x}",
-                                                stdout=subprocess.PIPE).communicate()
+                                 stdout=subprocess.PIPE).communicate()
                 print(f"Packaged NovelSave ID {x}")
         print()
 
@@ -222,7 +222,8 @@ class Database:
         for novel_entry in novel_entry_list:
             novelsave_id = novel_entry[1]
 
-            my_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+            my_headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
             url = novel_entry[0]
 
             if "novelpub" not in url:
@@ -234,7 +235,7 @@ class Database:
 
             # ScribbleHub: [0] https://cdn.scribblehub.com/images/3/immortal-only-accepts-female-disciples_77292_1642732345.jpg
             # NovelPub:    [1] https://static.novelpub.com/bookcover/300x400/00848-regressor-instruction-manual.jpg
-            # NovelFull:   https://novelfull.com + [1]
+            # NovelFull:    + [1]
             # https://novelfull.com/uploads/thumbs/war-sovereign-soaring-the-heaven-e5fb421bc4-2239c49aee6b961904acf173b7e4602a.jpg
 
             novel_cover = soup.find_all('img')
@@ -249,7 +250,10 @@ class Database:
             novel_cover_data = requests.get(novel_cover, headers=my_headers).content
 
             appdata_path = os.getenv('APPDATA').replace('\\', '/')[:-8]
-            os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
+            try:
+                os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
+            except FileExistsError:
+                pass
             with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
                 print(f"Downloading Novel Cover (ID: {novelsave_id}) : {novel_cover}")
                 nc.write(novel_cover_data)
@@ -287,12 +291,13 @@ def main():
             print()
         if result == 4:
             print()
-            subprocess.Popen("novelsave list")
+            subprocess.Popen("novelsave list").communicate()
             print()
         if result == 5:
             database.update_novel_covers()
         if result == 6:
             database.update_novels(package=True)
+
 
 if __name__ == '__main__':
     main()
