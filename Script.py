@@ -216,8 +216,11 @@ class Database:
     def update_novel_covers(self):
         # TODO Add novel cover ids to novelsave's database so when they are packed they are added
 
-        self.dbCursor.execute("SELECT novel_url, novelsave_id FROM Novels")
-        novel_entry_list = list(self.dbCursor.fetchall())
+        #db = sqlite3.connect("C:/Users/Lukeg/AppData/Local/Mensch272/novelsave/data.sqlite")
+        db = sqlite3.connect("/root/.config/novelsave/data.sqlite")
+        dbCursor = db.cursor()
+        dbCursor.execute("SELECT url, novel_id FROM novel_urls")
+        novel_entry_list = list(dbCursor.fetchall())
 
         for novel_entry in novel_entry_list:
             novelsave_id = novel_entry[1]
@@ -225,9 +228,6 @@ class Database:
             my_headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
             url = novel_entry[0]
-
-            if "novelpub" not in url:
-                continue
 
             r = requests.get(url, headers=my_headers)
             html = r.text
@@ -239,22 +239,36 @@ class Database:
             # https://novelfull.com/uploads/thumbs/war-sovereign-soaring-the-heaven-e5fb421bc4-2239c49aee6b961904acf173b7e4602a.jpg
 
             novel_cover = soup.find_all('img')
-            # if "scribblehub" in url:
-            #     novel_cover = str(novel_cover[0].get('src'))
-            # elif "novelpub" in url:
-            #  novel_cover = str(novel_cover[1].get('src'))
-            novel_cover = str(novel_cover[1].get('src'))
-            # elif "novelfull" in url:
-            #     novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
+            """ Sources:
+             - boxnovel.com
+             - novelfull.com
+             - readnovelfull.com
+             - novelpub.com
+             - scribblehub.com
+            """
+
+            if "scribblehub" in url:
+                novel_cover = str(novel_cover[0].get('src'))
+            elif "novelpub" in url:
+                novel_cover = str(novel_cover[1].get('src'))
+            elif ("allnovelfull" in url) or ("readnovelfull" in url):
+                novel_cover = str(novel_cover[1].get('src'))
+            elif "novelfull" in url:
+                novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
+            else:
+                # Give up
+                continue
 
             novel_cover_data = requests.get(novel_cover, headers=my_headers).content
 
-            appdata_path = os.getenv('APPDATA').replace('\\', '/')[:-8]
+            # appdata_path = os.getenv('APPDATA').replace('\\', '/')[:-8]
             try:
-                os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
+                #os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
+                os.mkdir(f'/root/.config/novelsave/data/{novelsave_id}/')
             except FileExistsError:
                 pass
-            with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
+            #with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
+            with open (f'/root/.config/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
                 print(f"Downloading Novel Cover (ID: {novelsave_id}) : {novel_cover}")
                 nc.write(novel_cover_data)
 
@@ -264,9 +278,9 @@ def main():
     database.novel_library_path = "G:/Books/Novels/novelsave"
 
     while True:
-        novelsave_config_show = str(subprocess.Popen(f"novelsave config show", stdout=subprocess.PIPE).communicate())
-        novel_ex_path = re.search(r"value=('.*[^']')", novelsave_config_show).group(1)
-        print(f"Current Novel Export Path: {novel_ex_path}")
+        #novelsave_config_show = str(subprocess.Popen(f"novelsave config show", stdout=subprocess.PIPE).communicate())
+        #novel_ex_path = re.search(r"value=('.*[^']')", novelsave_config_show).group(1)
+        #print(f"Current Novel Export Path: {novel_ex_path}")
 
         print("[1] Add Novel\n" +
               "[2] Update/Add novelsave Novels\n" +
