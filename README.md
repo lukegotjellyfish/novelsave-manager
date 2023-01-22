@@ -1,4 +1,4 @@
-# lightnovel-crawler-manager
+# novelsave-manager
 A Very WIP Script to manage the novelsave project for larger scale crawling and updating of ebooks.
 ___
 ## Python Requirements
