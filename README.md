@@ -1,6 +1,7 @@
 # novelsave-manager
-A Very WIP Script to manage the novelsave project for larger scale crawling and updating of ebooks.
-Main feataures currently include:
+A Very WIP Script to manage the novelsave project for larger scale crawling and updating of ebooks.<br>
+
+The main features currently include:
  - Downloading book covers for novelsave (Bypassing 403 errors)
  - Updating/Packaging all novels in the novelsave database
  
