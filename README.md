@@ -1,7 +1,7 @@
 # novelsave-manager
 A Very WIP Script to manage the novelsave project for larger scale crawling and updating of ebooks.
 Main feataures currently include:
- - Downloading book covers when novelsave fails with a 403 error
+ - Downloading book covers for novelsave (Bypassing 403 errors)
  - Updating/Packaging all novels in the novelsave database
  
  WIP Ideas that aren't implimented:
