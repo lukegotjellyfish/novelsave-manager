@@ -1,0 +1,2 @@
+1. Method to switch between novelsave databases to bypass sqlite limitations
+2. Method to save a list of URLs (and remove them from further novelsave operations) that cause SQL integrity errors so lightnovel-crawler can be used for them
