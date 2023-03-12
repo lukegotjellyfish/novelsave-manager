@@ -19,6 +19,66 @@ def decode_novelsave_output(value):
     return value
 
 
+def update_novel_covers():
+    # TODO Add novel cover ids to novelsave's database so when they are packed they are added
+
+    #db = sqlite3.connect("C:/Users/Lukeg/AppData/Local/Mensch272/novelsave/data.sqlite")
+    db = sqlite3.connect("/root/.config/novelsave/data.sqlite")
+    dbCursor = db.cursor()
+    dbCursor.execute("SELECT url, novel_id FROM novel_urls")
+    novel_entry_list = list(dbCursor.fetchall())
+
+    for novel_entry in novel_entry_list:
+        novelsave_id = novel_entry[1]
+
+        my_headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+        url = novel_entry[0]
+
+        r = requests.get(url, headers=my_headers)
+        html = r.text
+        soup = BeautifulSoup(html, 'html.parser')
+
+        # ScribbleHub: [0] https://cdn.scribblehub.com/images/3/immortal-only-accepts-female-disciples_77292_1642732345.jpg
+        # NovelPub:    [1] https://static.novelpub.com/bookcover/300x400/00848-regressor-instruction-manual.jpg
+        # NovelFull:    + [1]
+        # https://novelfull.com/uploads/thumbs/war-sovereign-soaring-the-heaven-e5fb421bc4-2239c49aee6b961904acf173b7e4602a.jpg
+
+        novel_cover = soup.find_all('img')
+        """ Sources:
+         - boxnovel.com
+         - novelfull.com
+         - readnovelfull.com
+         - novelpub.com
+         - scribblehub.com
+        """
+
+        if "scribblehub" in url:
+            novel_cover = str(novel_cover[0].get('src'))
+        elif "novelpub" in url:
+            novel_cover = str(novel_cover[1].get('src'))
+        elif ("allnovelfull" in url) or ("readnovelfull" in url):
+            novel_cover = str(novel_cover[1].get('src'))
+        elif "novelfull" in url:
+            novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
+        else:
+            # Give up
+            continue
+
+        novel_cover_data = requests.get(novel_cover, headers=my_headers).content
+
+        # appdata_path = os.getenv('APPDATA').replace('\\', '/')[:-8]
+        try:
+            #os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
+            os.mkdir(f'/root/.config/novelsave/data/{novelsave_id}/')
+        except FileExistsError:
+            pass
+        #with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
+        with open (f'/root/.config/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
+            print(f"Downloading Novel Cover (ID: {novelsave_id}) : {novel_cover}")
+            nc.write(novel_cover_data)
+
+
 class Database:
     db = None
     db_path = "Novel_Database.db"
@@ -213,65 +273,6 @@ class Database:
         # Novel has been added to the database, return True
         return True
 
-    def update_novel_covers(self):
-        # TODO Add novel cover ids to novelsave's database so when they are packed they are added
-
-        #db = sqlite3.connect("C:/Users/Lukeg/AppData/Local/Mensch272/novelsave/data.sqlite")
-        db = sqlite3.connect("/root/.config/novelsave/data.sqlite")
-        dbCursor = db.cursor()
-        dbCursor.execute("SELECT url, novel_id FROM novel_urls")
-        novel_entry_list = list(dbCursor.fetchall())
-
-        for novel_entry in novel_entry_list:
-            novelsave_id = novel_entry[1]
-
-            my_headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
-            url = novel_entry[0]
-
-            r = requests.get(url, headers=my_headers)
-            html = r.text
-            soup = BeautifulSoup(html, 'html.parser')
-
-            # ScribbleHub: [0] https://cdn.scribblehub.com/images/3/immortal-only-accepts-female-disciples_77292_1642732345.jpg
-            # NovelPub:    [1] https://static.novelpub.com/bookcover/300x400/00848-regressor-instruction-manual.jpg
-            # NovelFull:    + [1]
-            # https://novelfull.com/uploads/thumbs/war-sovereign-soaring-the-heaven-e5fb421bc4-2239c49aee6b961904acf173b7e4602a.jpg
-
-            novel_cover = soup.find_all('img')
-            """ Sources:
-             - boxnovel.com
-             - novelfull.com
-             - readnovelfull.com
-             - novelpub.com
-             - scribblehub.com
-            """
-
-            if "scribblehub" in url:
-                novel_cover = str(novel_cover[0].get('src'))
-            elif "novelpub" in url:
-                novel_cover = str(novel_cover[1].get('src'))
-            elif ("allnovelfull" in url) or ("readnovelfull" in url):
-                novel_cover = str(novel_cover[1].get('src'))
-            elif "novelfull" in url:
-                novel_cover = f"https://novelfull.com{novel_cover[1].get('src')}"
-            else:
-                # Give up
-                continue
-
-            novel_cover_data = requests.get(novel_cover, headers=my_headers).content
-
-            # appdata_path = os.getenv('APPDATA').replace('\\', '/')[:-8]
-            try:
-                #os.mkdir(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/')
-                os.mkdir(f'/root/.config/novelsave/data/{novelsave_id}/')
-            except FileExistsError:
-                pass
-            #with open(f'{appdata_path}/Local/Mensch272/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
-            with open (f'/root/.config/novelsave/data/{novelsave_id}/cover.jpg', 'wb') as nc:
-                print(f"Downloading Novel Cover (ID: {novelsave_id}) : {novel_cover}")
-                nc.write(novel_cover_data)
-
 
 def main():
     database = Database("Novel_Database.db")
@@ -308,7 +309,7 @@ def main():
             subprocess.Popen("novelsave list").communicate()
             print()
         if result == 5:
-            database.update_novel_covers()
+            update_novel_covers()
         if result == 6:
             database.update_novels(package=True)
 
